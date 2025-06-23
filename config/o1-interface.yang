@@ -1,0 +1,178 @@
+module o1-interface {
+  namespace "urn:example:o1-interface";
+  prefix "o1";
+
+  organization "Example Organization";
+  contact "admin@example.com";
+  description "YANG model for O1 interface management";
+
+  revision 2024-01-01 {
+    description "Initial version";
+  }
+
+  container o1-interface {
+    description "O1 interface configuration and operational data";
+    
+    list interface {
+      key "name";
+      description "List of O1 interfaces";
+      
+      leaf name {
+        type string;
+        description "Interface name (e.g., eth0, eth1)";
+      }
+      
+      leaf status {
+        type enumeration {
+          enum up;
+          enum down;
+          enum error;
+        }
+        default "up";
+        description "Interface status";
+      }
+      
+      leaf description {
+        type string;
+        description "Interface description";
+      }
+      
+      container tracing {
+        description "Tracing information for the interface";
+        
+        leaf traceid {
+          type string {
+            length "32";
+            pattern "[0-9a-fA-F]{32}";
+          }
+          description "32-character hexadecimal trace ID for distributed tracing";
+        }
+        
+        leaf spanid {
+          type string {
+            length "16";
+            pattern "[0-9a-fA-F]{16}";
+          }
+          description "16-character hexadecimal span ID for distributed tracing";
+        }
+        
+        leaf timestamp {
+          type uint64;
+          description "Unix timestamp when the tracing data was created";
+        }
+      }
+      
+      container statistics {
+        description "Interface statistics";
+        
+        leaf packets-in {
+          type uint64;
+          default "0";
+          description "Number of packets received";
+        }
+        
+        leaf packets-out {
+          type uint64;
+          default "0";
+          description "Number of packets transmitted";
+        }
+        
+        leaf bytes-in {
+          type uint64;
+          default "0";
+          description "Number of bytes received";
+        }
+        
+        leaf bytes-out {
+          type uint64;
+          default "0";
+          description "Number of bytes transmitted";
+        }
+      }
+    }
+  }
+
+  rpc get-interface-status {
+    description "Get the status of a specific interface";
+    
+    input {
+      leaf interface-name {
+        type string;
+        mandatory true;
+        description "Name of the interface to query";
+      }
+    }
+    
+    output {
+      leaf status {
+        type enumeration {
+          enum up;
+          enum down;
+          enum error;
+        }
+        description "Current status of the interface";
+      }
+      
+      leaf last-change {
+        type uint64;
+        description "Timestamp of last status change";
+      }
+    }
+  }
+
+  rpc set-interface-status {
+    description "Set the status of a specific interface";
+    
+    input {
+      leaf interface-name {
+        type string;
+        mandatory true;
+        description "Name of the interface to configure";
+      }
+      
+      leaf status {
+        type enumeration {
+          enum up;
+          enum down;
+        }
+        mandatory true;
+        description "Desired status of the interface";
+      }
+      
+      container tracing {
+        description "Tracing information for this operation";
+        
+        leaf traceid {
+          type string {
+            length "32";
+            pattern "[0-9a-fA-F]{32}";
+          }
+          description "32-character hexadecimal trace ID";
+        }
+        
+        leaf spanid {
+          type string {
+            length "16";
+            pattern "[0-9a-fA-F]{16}";
+          }
+          description "16-character hexadecimal span ID";
+        }
+      }
+    }
+    
+    output {
+      leaf result {
+        type enumeration {
+          enum success;
+          enum failure;
+        }
+        description "Result of the operation";
+      }
+      
+      leaf message {
+        type string;
+        description "Detailed result message";
+      }
+    }
+  }
+} 
