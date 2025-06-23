@@ -1,0 +1,42 @@
+module tracing {
+  namespace "urn:example:tracing";
+  prefix "tracing";
+
+  organization "Example Organization";
+  contact "admin@example.com";
+  description "YANG model for tracing data";
+
+  revision 2024-01-01 {
+    description "Initial version";
+  }
+
+  container tracing {
+    description "Tracing configuration and data";
+    
+    leaf traceid {
+      type string {
+        length "32";
+        pattern "[0-9a-fA-F]{32}";
+      }
+      description "32-character hexadecimal trace ID for distributed tracing";
+    }
+    
+    leaf spanid {
+      type string {
+        length "16";
+        pattern "[0-9a-fA-F]{16}";
+      }
+      description "16-character hexadecimal span ID for distributed tracing";
+    }
+    
+    leaf timestamp {
+      type uint64;
+      description "Unix timestamp when the tracing data was created";
+    }
+    
+    leaf source {
+      type string;
+      description "Source identifier for the tracing data";
+    }
+  }
+} 
